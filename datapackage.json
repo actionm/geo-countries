@@ -1,38 +1,42 @@
 {
   "name": "geo-countries",
   "title": "Country Polygons as GeoJSON",
-  "version": "0.2.0",
-  "description": "geodata data package providing geojson polygons for all the world's countries",
+  "version": "0.3.0",
+  "description": "Geodata package providing GeoJSON polygons for all the world's countries and territories.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/datasets/geo-countries.git"
+    "url": "https://github.com/actionm/geo-countries.git"
   },
   "sources": [
     {
       "name": "Natural Earth",
-      "path": "http://www.naturalearthdata.com/downloads/10m-cultural-vectors/",
+      "path": "https://www.naturalearthdata.com/downloads/",
       "title": "Natural Earth"
     }
   ],
   "keywords": [
     "geodata",
+    "geojson",
     "vector",
-    "country"
+    "country",
+    "territory",
+    "boundaries",
+    "natural-earth"
   ],
   "licenses": [
     {
       "name": "ODC-PDDL-1.0",
-      "path": "http://opendatacommons.org/licenses/pddl/",
+      "path": "https://opendatacommons.org/licenses/pddl/",
       "title": "Open Data Commons Public Domain Dedication and License v1.0"
     }
   ],
   "resources": [
     {
       "name": "countries",
-      "path": "data/countries.geojson",
-      "description": "GeoJSON FeatureCollection of 258 country (and territory) polygons. Features without an assigned ISO code carry the sentinel value \"-99\" for both ISO fields.",
+      "path": "https://github.com/actionm/geo-countries/releases/download/data-latest/countries.geojson",
+      "description": "GeoJSON FeatureCollection of country and territory polygons generated from Natural Earth's default de facto Admin 0 countries dataset.",
       "format": "geojson",
-      "mediatype": "application/json",
+      "mediatype": "application/geo+json",
       "schema": {
         "fields": [
           {
@@ -42,12 +46,48 @@
           },
           {
             "name": "ISO3166-1-Alpha-2",
-            "description": "2-letter ISO 3166-1 country code. Set to \"-99\" for features that have no assigned ISO code (e.g. disputed or unrecognised territories).",
+            "description": "2-letter ISO 3166-1 country code. Set to \"-99\" for features that have no assigned ISO code.",
             "type": "string"
           },
           {
             "name": "ISO3166-1-Alpha-3",
-            "description": "3-letter ISO 3166-1 country code. Set to \"-99\" for features that have no assigned ISO code (e.g. disputed or unrecognised territories).",
+            "description": "3-letter ISO 3166-1 country code. Set to \"-99\" for features that have no assigned ISO code.",
+            "type": "string"
+          }
+        ]
+      },
+      "foreignKeys": [
+        {
+          "fields": "ISO3166-1-Alpha-3",
+          "reference": {
+            "datapackage": "https://github.com/datasets/country-codes/",
+            "resource": "country-codes",
+            "fields": "ISO3166-1-Alpha-3"
+          }
+        }
+      ]
+    },
+    {
+      "name": "countries-de-jure-usa",
+      "path": "https://github.com/actionm/geo-countries/releases/download/data-latest/countries_de_jure_usa.geojson",
+      "description": "GeoJSON FeatureCollection of country and territory polygons generated from Natural Earth's de jure Admin 0 countries point-of-view dataset for the USA POV.",
+      "format": "geojson",
+      "mediatype": "application/geo+json",
+      "schema": {
+        "fields": [
+          {
+            "name": "name",
+            "description": "Common name of the country or territory",
+            "type": "string"
+          },
+          {
+            "name": "ISO3166-1-Alpha-2",
+            "description": "2-letter ISO 3166-1 country code. Set to \"-99\" for features that have no assigned ISO code.",
+            "type": "string"
+          },
+          {
+            "name": "ISO3166-1-Alpha-3",
+            "description": "3-letter ISO 3166-1 country code. Set to \"-99\" for features that have no assigned ISO code.",
             "type": "string"
           }
         ]
@@ -64,8 +104,6 @@
       ]
     }
   ],
-  "homepage": "http://github.com/datasets/geo-countries",
-  "collection": "geojson",
-  "has_premium": true,
-  "has_solutions": ["global-country-region-reference-data"]
+  "homepage": "https://github.com/actionm/geo-countries",
+  "collection": "geojson"
 }

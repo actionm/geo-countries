@@ -50,7 +50,7 @@ else
 $(error Unsupported BOUNDARY_VIEW "$(BOUNDARY_VIEW)". Use "de_facto" or "de_jure")
 endif
 
-ZIP_FILE := $(DATASET).zip
+ZIP_FILE := $(DATA_DIR)/$(DATASET).zip
 
 info:
 	@echo "BOUNDARY_VIEW=$(BOUNDARY_VIEW)"
@@ -62,13 +62,17 @@ info:
 	@echo "DATASET=$(DATASET)"
 	@echo "SOURCE_URL=$(SOURCE_URL)"
 	@echo "OUTPUT_FILE=$(OUTPUT_FILE)"
+	@echo "ZIP_FILE=$(ZIP_FILE)"
 
 clean:
 	find . -maxdepth 1 -name "*.zip" -exec rm -f {} +
+	rm -f data/*.zip
 	rm -f data/countries.geojson data/countries.geojson.gz
 	rm -f data/countries_de_jure_*.geojson data/countries_de_jure_*.geojson.gz
+	rm -f data/SHA256SUMS data/SOURCE_SHA256SUMS
 
 download:
+	mkdir -p "$(DATA_DIR)"
 	@if [ ! -f "$(ZIP_FILE)" ]; then \
 		curl -L -o "$(ZIP_FILE)" "$(SOURCE_URL)"; \
 	fi
