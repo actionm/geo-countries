@@ -44,15 +44,13 @@ jobs:
         run: |
           make data BOUNDARY_VIEW=de_jure POV=usa
 
-      - name: Prepare checksums
+      - name: Prepare comparison checksums
         run: |
           cd data
           sha256sum \
             countries.geojson \
-            countries.geojson.gz \
             countries_de_jure_usa.geojson \
-            countries_de_jure_usa.geojson.gz \
-            > SHA256SUMS
+            > SOURCE_SHA256SUMS
 
       - name: Check previous release
         if: github.event_name != 'pull_request'
@@ -62,8 +60,8 @@ jobs:
         run: |
           mkdir -p previous
 
-          if gh release download data-latest -p SHA256SUMS -D previous; then
-            if cmp -s data/SHA256SUMS previous/SHA256SUMS; then
+          if gh release download data-latest -p SOURCE_SHA256SUMS -D previous; then
+            if cmp -s data/SOURCE_SHA256SUMS previous/SOURCE_SHA256SUMS; then
               echo "changed=false" >> "$GITHUB_OUTPUT"
               echo "No data changes"
             else
@@ -74,6 +72,17 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "No previous release found"
           fi
+
+      - name: Prepare release checksums
+        if: github.event_name != 'pull_request' && steps.changes.outputs.changed == 'true'
+        run: |
+          cd data
+          sha256sum \
+            countries.geojson \
+            countries.geojson.gz \
+            countries_de_jure_usa.geojson \
+            countries_de_jure_usa.geojson.gz \
+            > SHA256SUMS
 
       - name: Publish data release
         if: github.event_name != 'pull_request' && steps.changes.outputs.changed == 'true'
@@ -89,6 +98,7 @@ jobs:
             data/countries.geojson.gz \
             data/countries_de_jure_usa.geojson \
             data/countries_de_jure_usa.geojson.gz \
+            data/SOURCE_SHA256SUMS \
             data/SHA256SUMS \
             --title "Latest generated data" \
             --notes "Generated country boundary data.
