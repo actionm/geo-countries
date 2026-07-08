@@ -7,7 +7,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-/data
+/data/*
 
 # Local downloaded source data
 /*.zip
