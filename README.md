@@ -1,9 +1,16 @@
-<a className="gh-badge" href="https://datahub.io/core/geo-countries"><img src="https://badgen.net/badge/icon/View%20on%20datahub.io/orange?icon=https://datahub.io/datahub-cube-badge-icon.svg&label&scale=1.25" alt="badge" /></a>
+<a className="gh-badge" href="https://github.com/actionm/geo-countries/releases/tag/data-latest"><img src="https://badgen.net/badge/icon/Download%20latest%20data/blue?icon=github&label&scale=1.25" alt="Download latest data" /></a>
 
 ## Description
 
-Geodata [data package][datapackage] providing GeoJSON polygons for all the world's countries.
+Geodata [data package][datapackage] providing GeoJSON polygons for all the world's countries and territories.
 Perfect for use in apps and visualizations.
+
+Generated data files are published as GitHub Release assets and are available from the latest data release:
+
+- [`countries.geojson`][countries-geojson] - default Natural Earth country boundaries based on de facto control on the ground.
+- [`countries.geojson.gz`][countries-geojson-gz] - gzip-compressed default dataset.
+- [`countries_de_jure_usa.geojson`][countries-de-jure-usa-geojson] - Natural Earth global point-of-view boundaries using the USA POV, intended for an internationally recognised / de jure-style view of disputed borders.
+- [`countries_de_jure_usa.geojson.gz`][countries-de-jure-usa-geojson-gz] - gzip-compressed de jure USA POV dataset.
 
 ## Data
 
@@ -11,19 +18,23 @@ The data comes from [Natural Earth][naturalearth], a community effort to make vi
 
 This package provides two generated outputs:
 
-- `data/countries.geojson` - default Natural Earth country boundaries based on de facto control on the ground.
-- `data/countries_de_jure_usa.geojson` - Natural Earth global point-of-view boundaries using the USA POV, intended for an internationally recognised / de jure-style view of disputed borders.
+- `countries.geojson` - default Natural Earth country boundaries based on de facto control on the ground.
+- `countries_de_jure_usa.geojson` - Natural Earth global point-of-view boundaries using the USA POV, intended for an internationally recognised / de jure-style view of disputed borders.
 
-Compressed `.gz` files are generated next to each GeoJSON file.
+Compressed `.gz` files are generated and published next to each GeoJSON file.
 
 More info about countries can be obtained from datapackage https://github.com/datasets/country-codes by a join on field `ISO3166-1-Alpha-3`.
 
+[countries-geojson]: https://github.com/actionm/geo-countries/releases/download/data-latest/countries.geojson
+[countries-geojson-gz]: https://github.com/actionm/geo-countries/releases/download/data-latest/countries.geojson.gz
+[countries-de-jure-usa-geojson]: https://github.com/actionm/geo-countries/releases/download/data-latest/countries_de_jure_usa.geojson
+[countries-de-jure-usa-geojson-gz]: https://github.com/actionm/geo-countries/releases/download/data-latest/countries_de_jure_usa.geojson.gz
 [naturalearth]: https://www.naturalearthdata.com/
 [datapackage]: https://datapackage.org/standard/data-package/
 
 ## Preparation
 
-To run the script and update the data:
+To run the script and generate the data locally:
 
 ### Prerequisites
 
@@ -52,9 +63,9 @@ The project uses `ogr2ogr` to convert Natural Earth's country boundaries from Sh
 - Compact JSON output through `jq -c`
 - Gzip-compressed output through `gzip -9`
 - Selected fields:
-  - `name`: Common name of the country from the Natural Earth `admin` field
-  - `ISO3166-1-Alpha-2`: Two-letter ISO country code from the `iso_a2` field
-  - `ISO3166-1-Alpha-3`: Three-letter ISO country code from the `iso_a3` field
+  - `name`: Common name of the country or territory from the Natural Earth `admin` field
+  - `ISO3166-1-Alpha-2`: Two-letter ISO country code from the Natural Earth `iso_a2` field
+  - `ISO3166-1-Alpha-3`: Three-letter ISO country code from the Natural Earth `iso_a3` field
 
 To process the default de facto data:
 
@@ -64,7 +75,7 @@ make data
 
 This will:
 
-1. Download the Natural Earth countries dataset.
+1. Download the Natural Earth countries dataset into the `data/` directory.
 2. Convert it to GeoJSON format.
 3. Save the result in `data/countries.geojson`.
 4. Save the compressed result in `data/countries.geojson.gz`.
@@ -77,10 +88,12 @@ make data BOUNDARY_VIEW=de_jure POV=usa
 
 This will:
 
-1. Download the Natural Earth USA point-of-view countries dataset.
+1. Download the Natural Earth USA point-of-view countries dataset into the `data/` directory.
 2. Convert it to GeoJSON format.
 3. Save the result in `data/countries_de_jure_usa.geojson`.
 4. Save the compressed result in `data/countries_de_jure_usa.geojson.gz`.
+
+The `data/` directory is ignored by Git. Generated files are published automatically by GitHub Actions to the `data-latest` release when source GeoJSON checksums change.
 
 ### Makefile Options
 
