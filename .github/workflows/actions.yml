@@ -44,22 +44,53 @@ jobs:
         run: |
           make data BOUNDARY_VIEW=de_jure POV=usa
 
-      - name: Commit generated data
-        if: github.event_name != 'pull_request'
-        env:
-          CI_COMMIT_NAME: "Automated commit"
-          CI_COMMIT_EMAIL: "actions@users.noreply.github.com"
-          CI_COMMIT_MESSAGE: "Automated commit"
+      - name: Prepare checksums
         run: |
-          git config --global user.email "${CI_COMMIT_EMAIL}"
-          git config --global user.name "${CI_COMMIT_NAME}"
+          cd data
+          sha256sum \
+            countries.geojson \
+            countries.geojson.gz \
+            countries_de_jure_usa.geojson \
+            countries_de_jure_usa.geojson.gz \
+            > SHA256SUMS
 
-          git add -f data/countries.geojson data/countries.geojson.gz
-          git add -f data/countries_de_jure_usa.geojson data/countries_de_jure_usa.geojson.gz
+      - name: Check previous release
+        if: github.event_name != 'pull_request'
+        id: changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p previous
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
+          if gh release download data-latest -p SHA256SUMS -D previous; then
+            if cmp -s data/SHA256SUMS previous/SHA256SUMS; then
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+              echo "No data changes"
+            else
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              echo "Data changed"
+            fi
           else
-            git commit -m "${CI_COMMIT_MESSAGE}"
-            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "No previous release found"
           fi
+
+      - name: Publish data release
+        if: github.event_name != 'pull_request' && steps.changes.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          UPDATED_AT="$(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+
+          gh release delete data-latest --cleanup-tag -y || true
+
+          gh release create data-latest \
+            data/countries.geojson \
+            data/countries.geojson.gz \
+            data/countries_de_jure_usa.geojson \
+            data/countries_de_jure_usa.geojson.gz \
+            data/SHA256SUMS \
+            --title "Latest generated data" \
+            --notes "Generated country boundary data.
+
+          Updated at: ${UPDATED_AT}"
